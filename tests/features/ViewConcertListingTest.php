@@ -13,7 +13,6 @@ class ViewConcertListingTest extends TestCase
     /** @test */
     public function user_can_view_a_concert_listing()
     {
-        // Arrange
         $concert = Concert::create([
             'title' => 'The Red Chord',
             'subtitle' => 'with Animosity and Lethargy',
@@ -27,10 +26,8 @@ class ViewConcertListingTest extends TestCase
             'additional_information' => 'For tickets, call (555) 555-5555.',
         ]);
 
-        // Act
         $this->visit('/concerts/' . $concert->id);
 
-        // Assert
         $this->see('The Red Chord');
         $this->see('with Animosity and Lethargy');
         $this->see('December 13, 2016');
@@ -40,5 +37,17 @@ class ViewConcertListingTest extends TestCase
         $this->see('123 Example Lane');
         $this->see('Laraville, ON 17916');
         $this->see('For tickets, call (555) 555-5555.');
+    }
+
+    /** @test */
+    public function user_cannot_view_unpublished_concert_listings()
+    {
+        $concert = factory(Concert::class)->create([
+            'published_at' => null,
+        ]);
+
+        $this->get('/concerts/' . $concert->id);
+
+        $this->assertResponseStatus(404);
     }
 }
